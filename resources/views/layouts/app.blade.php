@@ -24,7 +24,7 @@
                     <nav aria-label="Main navigation" class="main-navigation">
                         <a
                             href="{{ route('dashboard') }}"
-                            class="navigation-link {{ request()->routeIs('dashboard') ? 'navigation-link-active' : '' }}"
+                            class="navigation-link {{ request()->routeIs('dashboard', 'overview') ? 'navigation-link-active' : '' }}"
                         >
                             Overview
                         </a>

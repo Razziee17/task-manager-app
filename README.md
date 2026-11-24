@@ -7,6 +7,21 @@
 <a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
 </p>
 
+## Task Manager
+
+A task manager application built with Laravel. Its frontend uses Blade templates, Tailwind CSS 4 for styling, Vite for building assets, and plain JavaScript in `resources/js/app.js`. It does not use React or Vue.
+
+### UI template sources
+
+No third-party UI template was used. The task manager pages and layout were written for this project, starting from the standard Laravel application scaffold.
+
+Technology references:
+
+- [Laravel documentation](https://laravel.com/docs)
+- [Blade documentation](https://laravel.com/docs/blade)
+- [Tailwind CSS documentation](https://tailwindcss.com/docs)
+- [Vite documentation](https://vite.dev/guide/)
+
 ## About Laravel
 
 Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
