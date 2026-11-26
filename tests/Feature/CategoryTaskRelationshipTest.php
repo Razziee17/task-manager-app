@@ -30,7 +30,8 @@ class CategoryTaskRelationshipTest extends TestCase
         $this->assertSame($user->id, $task->user->id);
         $this->assertSame('Work', $task->category->name);
 
-        $this->get('/')
+        $this->actingAs($user)
+            ->get(route('overview'))
             ->assertOk();
     }
 }

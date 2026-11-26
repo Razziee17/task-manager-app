@@ -3,22 +3,25 @@
 namespace App\Http\Controllers;
 
 use App\Models\Category;
-use App\Models\Task;
 use Illuminate\Contracts\View\View;
+use Illuminate\Http\RedirectResponse;
 
 class TaskController extends Controller
 {
-    public function index(): View
+    public function index(): RedirectResponse
     {
-        return $this->overview();
+        return redirect()->route('overview');
     }
 
     public function overview(): View
     {
-        $tasks = Task::with('category')
+        $tasks = auth()->user()->tasks()
+            ->with('category')
             ->get();
 
-        $categories = Category::withCount('tasks')
+        $categories = Category::withCount([
+            'tasks' => fn ($query) => $query->where('user_id', auth()->id()),
+        ])
             ->orderBy('name')
             ->get();
 

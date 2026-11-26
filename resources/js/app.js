@@ -1,4 +1,5 @@
-const storageKey = 'taskManagerTasks';
+const userId = document.body.dataset.userId;
+const storageKey = `taskManagerTasks-${userId}`;
 
 function readTasks() {
     try {
@@ -35,6 +36,12 @@ const taskTableBody = document.querySelector('#task-list');
 const taskModal = document.querySelector('#task-modal');
 const taskForm = document.querySelector('#task-form');
 const taskModalTitle = document.querySelector('#task-modal-title');
+const confirmationModal = document.querySelector('#task-confirmation-modal');
+const confirmationTitle = document.querySelector('#task-confirmation-title');
+const confirmationMessage = document.querySelector('#task-confirmation-message');
+const confirmTaskActionButton = document.querySelector('#confirm-task-action');
+let pendingConfirmation = null;
+let confirmationTrigger = null;
 
 function openTaskModal(task = null) {
     if (!taskModal || !taskForm) {
@@ -58,6 +65,95 @@ function openTaskModal(task = null) {
 function closeTaskModal() {
     if (taskModal) {
         taskModal.hidden = true;
+    }
+}
+
+function openConfirmationModal(action, task) {
+    const confirmations = {
+        edit: {
+            title: 'Edit task?',
+            message: `Open "${task.title}" for editing?`,
+            button: 'Continue',
+            buttonClass: 'primary-button',
+        },
+        complete: {
+            title: 'Mark task as done?',
+            message: `Mark "${task.title}" as completed?`,
+            button: 'Mark done',
+            buttonClass: 'primary-button',
+        },
+        delete: {
+            title: 'Delete task?',
+            message: `Delete "${task.title}"? This cannot be undone.`,
+            button: 'Delete',
+            buttonClass: 'danger-button',
+        },
+    };
+    const confirmation = confirmations[action];
+
+    if (!confirmationModal || !confirmation) {
+        return;
+    }
+
+    pendingConfirmation = { action, taskId: task.id };
+    confirmationTrigger = document.activeElement instanceof HTMLElement ? document.activeElement : null;
+    confirmationTitle.textContent = confirmation.title;
+    confirmationMessage.textContent = confirmation.message;
+    confirmTaskActionButton.textContent = confirmation.button;
+    confirmTaskActionButton.className = confirmation.buttonClass;
+    confirmationModal.hidden = false;
+    document.querySelector('#cancel-task-confirmation').focus();
+}
+
+function closeConfirmationModal(restoreFocus = true) {
+    if (!confirmationModal) {
+        return;
+    }
+
+    confirmationModal.hidden = true;
+    pendingConfirmation = null;
+
+    const trigger = confirmationTrigger;
+    confirmationTrigger = null;
+
+    if (restoreFocus && trigger instanceof HTMLElement) {
+        trigger.focus();
+    }
+}
+
+function confirmPendingAction() {
+    if (!pendingConfirmation) {
+        return;
+    }
+
+    const { action, taskId } = pendingConfirmation;
+    const tasks = readTasks();
+    const task = tasks.find((item) => item.id === taskId);
+    closeConfirmationModal(false);
+
+    if (!task) {
+        renderTasks();
+        return;
+    }
+
+    if (action === 'edit') {
+        openTaskModal(task);
+        return;
+    }
+
+    if (action === 'complete') {
+        if (task.status !== 'done') {
+            task.status = 'done';
+            saveTasks(tasks);
+        }
+
+        renderTasks();
+        return;
+    }
+
+    if (action === 'delete') {
+        saveTasks(tasks.filter((item) => item.id !== taskId));
+        renderTasks();
     }
 }
 
@@ -156,10 +252,20 @@ function renderTasks() {
 
         const actionCell = document.createElement('td');
         actionCell.className = 'task-actions';
-        actionCell.append(
+        const actionButtons = [
             createActionButton('Edit', 'table-action', 'edit', task.id),
+        ];
+
+        if (task.status !== 'done') {
+            actionButtons.push(
+                createActionButton('Done', 'table-action table-action-success', 'complete', task.id),
+            );
+        }
+
+        actionButtons.push(
             createActionButton('Delete', 'table-action table-action-danger', 'delete', task.id),
         );
+        actionCell.append(...actionButtons);
 
         row.append(taskCell, categoryCell, statusCell, dateCell, actionCell);
         taskTableBody.append(row);
@@ -175,6 +281,15 @@ document.querySelector('#cancel-task')?.addEventListener('click', closeTaskModal
 document.querySelector('#task-modal')?.addEventListener('click', (event) => {
     if (event.target === event.currentTarget) {
         closeTaskModal();
+    }
+});
+
+document.querySelector('#close-task-confirmation')?.addEventListener('click', () => closeConfirmationModal());
+document.querySelector('#cancel-task-confirmation')?.addEventListener('click', () => closeConfirmationModal());
+confirmTaskActionButton?.addEventListener('click', confirmPendingAction);
+confirmationModal?.addEventListener('click', (event) => {
+    if (event.target === event.currentTarget) {
+        closeConfirmationModal();
     }
 });
 
@@ -227,15 +342,8 @@ taskTableBody?.addEventListener('click', (event) => {
     const tasks = readTasks();
     const task = tasks.find((item) => item.id === button.dataset.taskId);
 
-    if (button.dataset.action === 'edit' && task) {
-        openTaskModal(task);
-    }
-
-    if (button.dataset.action === 'delete' && task) {
-        if (window.confirm(`Delete "${task.title}"?`)) {
-            saveTasks(tasks.filter((item) => item.id !== task.id));
-            renderTasks();
-        }
+    if (task && ['edit', 'complete', 'delete'].includes(button.dataset.action)) {
+        openConfirmationModal(button.dataset.action, task);
     }
 });
 
@@ -244,6 +352,11 @@ document.querySelector('#category-filter')?.addEventListener('change', filterTas
 document.querySelector('#status-filter')?.addEventListener('change', filterTasks);
 
 document.addEventListener('keydown', (event) => {
+    if (event.key === 'Escape' && confirmationModal && !confirmationModal.hidden) {
+        closeConfirmationModal();
+        return;
+    }
+
     if (event.key === 'Escape' && taskModal && !taskModal.hidden) {
         closeTaskModal();
     }

@@ -118,4 +118,18 @@
             </form>
         </div>
     </div>
+
+    <div class="modal-backdrop" id="task-confirmation-modal" hidden>
+        <div class="confirmation-modal" role="alertdialog" aria-modal="true" aria-labelledby="task-confirmation-title" aria-describedby="task-confirmation-message">
+            <div class="modal-heading">
+                <h2 id="task-confirmation-title">Confirm action</h2>
+                <button type="button" class="icon-button" id="close-task-confirmation" aria-label="Cancel">×</button>
+            </div>
+            <p class="confirmation-message" id="task-confirmation-message"></p>
+            <div class="modal-actions">
+                <button type="button" class="secondary-button" id="cancel-task-confirmation">Cancel</button>
+                <button type="button" class="primary-button" id="confirm-task-action">Continue</button>
+            </div>
+        </div>
+    </div>
 @endsection

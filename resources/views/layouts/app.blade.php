@@ -9,11 +9,11 @@
 
         @vite(['resources/css/app.css', 'resources/js/app.js'])
     </head>
-    <body class="app-body">
+    <body class="app-body" data-user-id="{{ auth()->id() }}">
         <div class="app-shell">
             <header class="app-header">
                 <div class="app-header-content">
-                    <a href="{{ route('dashboard') }}" class="brand-link">
+                    <a href="{{ route('overview') }}" class="brand-link">
                         <span class="brand-icon">T</span>
                         <span>
                             <span class="brand-name">Task Manager</span>
@@ -23,7 +23,7 @@
 
                     <nav aria-label="Main navigation" class="main-navigation">
                         <a
-                            href="{{ route('dashboard') }}"
+                            href="{{ route('overview') }}"
                             class="navigation-link {{ request()->routeIs('dashboard', 'overview') ? 'navigation-link-active' : '' }}"
                         >
                             Overview
@@ -36,9 +36,13 @@
                         </a>
                     </nav>
 
-                    <span class="workspace-label">
-                        Personal workspace
-                    </span>
+                    <div class="account-menu">
+                        <span class="workspace-label">{{ auth()->user()->name }}</span>
+                        <form method="POST" action="{{ route('logout') }}">
+                            @csrf
+                            <button type="submit" class="logout-button">Log out</button>
+                        </form>
+                    </div>
                 </div>
             </header>
 
