@@ -18,21 +18,8 @@
     <form method="POST" action="{{ route('login.store') }}" class="auth-form">
         @csrf
 
-        <label class="form-field">
-            <span>Email address</span>
-            <input type="email" name="email" value="{{ old('email') }}" autocomplete="email" required autofocus>
-            @error('email')
-                <small class="field-error">{{ $message }}</small>
-            @enderror
-        </label>
-
-        <label class="form-field">
-            <span>Password</span>
-            <input type="password" name="password" autocomplete="current-password" required>
-            @error('password')
-                <small class="field-error">{{ $message }}</small>
-            @enderror
-        </label>
+        <x-form-field label="Email address" name="email" type="email" autocomplete="email" required autofocus />
+        <x-form-field label="Password" name="password" type="password" autocomplete="current-password" required />
 
         <label class="remember-option">
             <input type="checkbox" name="remember" value="1">

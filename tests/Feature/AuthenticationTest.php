@@ -14,11 +14,16 @@ class AuthenticationTest extends TestCase
     {
         $this->get(route('login'))
             ->assertOk()
-            ->assertSee('Log in to your account');
+            ->assertSee('Log in to your account')
+            ->assertSee('name="email"', false)
+            ->assertSee('name="password"', false);
 
         $this->get(route('register'))
             ->assertOk()
-            ->assertSee('Create your account');
+            ->assertSee('Create your account')
+            ->assertSee('name="name"', false)
+            ->assertSee('name="password_confirmation"', false)
+            ->assertSee('Use at least 8 characters.');
     }
 
     public function test_registration_creates_a_user_and_signs_them_in(): void

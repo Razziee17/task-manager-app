@@ -12,35 +12,10 @@
     <form method="POST" action="{{ route('register.store') }}" class="auth-form">
         @csrf
 
-        <label class="form-field">
-            <span>Your name</span>
-            <input type="text" name="name" value="{{ old('name') }}" autocomplete="name" maxlength="255" required autofocus>
-            @error('name')
-                <small class="field-error">{{ $message }}</small>
-            @enderror
-        </label>
-
-        <label class="form-field">
-            <span>Email address</span>
-            <input type="email" name="email" value="{{ old('email') }}" autocomplete="email" maxlength="255" required>
-            @error('email')
-                <small class="field-error">{{ $message }}</small>
-            @enderror
-        </label>
-
-        <label class="form-field">
-            <span>Password</span>
-            <input type="password" name="password" autocomplete="new-password" minlength="8" required>
-            <small class="form-hint">Use at least 8 characters.</small>
-            @error('password')
-                <small class="field-error">{{ $message }}</small>
-            @enderror
-        </label>
-
-        <label class="form-field">
-            <span>Confirm password</span>
-            <input type="password" name="password_confirmation" autocomplete="new-password" minlength="8" required>
-        </label>
+        <x-form-field label="Your name" name="name" autocomplete="name" maxlength="255" required autofocus />
+        <x-form-field label="Email address" name="email" type="email" autocomplete="email" maxlength="255" required />
+        <x-form-field label="Password" name="password" type="password" autocomplete="new-password" minlength="8" hint="Use at least 8 characters." required />
+        <x-form-field label="Confirm password" name="password_confirmation" type="password" autocomplete="new-password" minlength="8" required />
 
         <button type="submit" class="primary-button auth-submit">Create account</button>
     </form>

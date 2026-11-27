@@ -1,85 +1,106 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# Task Manager
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+A Laravel task manager with PostgreSQL storage, session-based authentication, and a JSON API. The interface uses Blade, Tailwind CSS 4, Vite, and plain JavaScript with Fetch.
 
-## Task Manager
+## Features
 
-A task manager application built with Laravel. Its frontend uses Blade templates, Tailwind CSS 4 for styling, Vite for building assets, and plain JavaScript in `resources/js/app.js`. It does not use React or Vue.
+- Register, log in, and log out with authenticated Overview and Tasks pages.
+- Create, view, edit, complete, and delete tasks.
+- Organize tasks by category and filter by category or status; search and paginate the task list.
+- Store tasks in PostgreSQL and scope task access to the signed-in user.
+- Display task totals and per-category counts on the Overview page.
 
-Users can register, log in, and log out. Overview and task pages require an authenticated session. The task list uses the authenticated session to call Laravel's JSON API with Fetch; tasks are saved in PostgreSQL and scoped to their owner.
+## Requirements
 
-### Local PostgreSQL database
+- PHP 8.3 or later with `pdo_pgsql`
+- Composer
+- PostgreSQL 18
+- Node.js and npm
 
-The application uses PostgreSQL 18 for its local database. Set the database values in `.env` to `pgsql`, host `127.0.0.1`, port `5432`, database `task_manager`, and username `postgres`. Set `DB_PASSWORD` to the password chosen during PostgreSQL installation. Keep `.env` local and do not commit it.
+## Local setup
 
-Run `php artisan migrate` to create the database tables, then run `php artisan db:seed --class=CategorySeeder` to add the Work, School, and Personal categories used by the task form. This does not add demo users or tasks.
+1. Install the PHP and Node.js dependencies:
 
-The authenticated JSON endpoints are `GET /api/categories` and `GET`, `POST`, `PATCH`, and `DELETE /api/tasks`. Task responses and validation errors use JSON. Tasks are only returned or modified for the signed-in user.
+   ```sh
+   composer install
+   npm install
+   ```
 
-To browse the database, open pgAdmin 4 and connect to the PostgreSQL 18 server. Expand **Databases > task_manager > Schemas > public > Tables**. Refresh the Tables node to see the schema. User accounts created through registration are stored in `users`; tasks created or changed on the Tasks page are stored in `tasks`.
+2. Create a local environment file and generate the Laravel application key:
 
-### UI template sources
+   ```sh
+   if (-not (Test-Path .env)) { Copy-Item .env.example .env }
+   php artisan key:generate
+   ```
 
-No third-party UI template was used. The task manager pages and layout were written for this project, starting from the standard Laravel application scaffold.
+   If `.env` already exists, keep it and do not overwrite your local settings.
 
-Technology references:
+3. In `.env`, configure PostgreSQL:
 
-- [Laravel documentation](https://laravel.com/docs)
-- [Blade documentation](https://laravel.com/docs/blade)
-- [Tailwind CSS documentation](https://tailwindcss.com/docs)
-- [Vite documentation](https://vite.dev/guide/)
+   ```dotenv
+   DB_CONNECTION=pgsql
+   DB_HOST=127.0.0.1
+   DB_PORT=5432
+   DB_DATABASE=task_manager
+   DB_USERNAME=postgres
+   DB_PASSWORD="your-local-postgres-password"
+   ```
 
-## About Laravel
+   Replace the password locally with the one set for your PostgreSQL account. Never commit `.env` or share its password.
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+4. Create a PostgreSQL database named `task_manager` if it does not already exist. In pgAdmin, right-click **Databases**, select **Create > Database**, enter `task_manager`, and save.
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+5. Create the tables and the task categories:
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+   ```sh
+   php artisan migrate
+   php artisan db:seed --class=CategorySeeder
+   ```
 
-## Learning Laravel
+   The category seeder adds Work, School, and Personal; it does not create demo users or tasks.
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+6. In separate terminals, start the Laravel server and Vite:
 
-In addition, [Laracasts](https://laracasts.com) contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+   ```sh
+   php artisan serve
+   ```
 
-You can also watch bite-sized lessons with real-world projects on [Laravel Learn](https://laravel.com/learn), where you will be guided through building a Laravel application from scratch while learning PHP fundamentals.
+   ```sh
+   npm run dev
+   ```
 
-## Agentic Development
+7. Open `http://127.0.0.1:8000` and register an account.
 
-Laravel's predictable structure and conventions make it ideal for AI coding agents like Claude Code, Cursor, and GitHub Copilot. Install [Laravel Boost](https://laravel.com/docs/ai) to supercharge your AI workflow:
+## Task API
 
-```bash
-composer require laravel/boost --dev
+The API uses the signed-in browser session and Laravel CSRF protection. Task endpoints only return or modify tasks belonging to the authenticated user. Responses use JSON; invalid input returns JSON validation errors.
 
-php artisan boost:install
+| Method | Endpoint | Purpose |
+| --- | --- | --- |
+| `GET` | `/api/categories` | List categories and the current user's task count per category |
+| `GET` | `/api/tasks` | List the current user's tasks |
+| `GET` | `/api/tasks/{task}` | Show one of the current user's tasks |
+| `POST` | `/api/tasks` | Create a task |
+| `PUT` / `PATCH` | `/api/tasks/{task}` | Update a task |
+| `DELETE` | `/api/tasks/{task}` | Delete a task |
+
+Task fields are `title`, `description` (optional), `category_id`, `status` (`pending` or `done`), and `due_date` (`YYYY-MM-DD`). New tasks default to `pending`.
+
+## Tests and checks
+
+Run the feature and unit tests:
+
+```sh
+php artisan test
 ```
 
-Boost provides your agent 15+ tools and skills that help agents build Laravel applications while following best practices.
+Tests use in-memory SQLite and do not change the local PostgreSQL database. Check PHP formatting and build the frontend with:
 
-## Contributing
+```sh
+vendor/bin/pint --test
+npm run build
+```
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+## Inspect PostgreSQL data
 
-## Code of Conduct
-
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
-
-## Security Vulnerabilities
-
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
-
-## License
-
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+In pgAdmin, expand **Servers > PostgreSQL 18 > Databases > task_manager > Schemas > public > Tables**. Right-click `users` or `tasks` and choose **View/Edit Data > All Rows**.
