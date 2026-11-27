@@ -34,9 +34,6 @@
                     <span class="screen-reader-only">Filter by category</span>
                     <select id="category-filter">
                         <option value="all">All categories</option>
-                        @foreach ($categories as $category)
-                            <option value="{{ $category->name }}">{{ $category->name }}</option>
-                        @endforeach
                     </select>
                 </label>
                 <label class="filter-field">
@@ -68,6 +65,14 @@
                     <p class="empty-state-description">Add a task to start planning your work.</p>
                 </div>
                 <p id="no-filtered-results" class="no-results" hidden>No tasks match the selected filters.</p>
+                <div id="task-pagination" class="task-pagination" hidden>
+                    <span id="task-page-status" aria-live="polite"></span>
+                    <div class="task-pagination-actions">
+                        <button type="button" class="secondary-button" id="previous-task-page">Previous</button>
+                        <button type="button" class="secondary-button" id="next-task-page">Next</button>
+                    </div>
+                </div>
+                <p id="task-api-error" class="api-error" role="alert" hidden></p>
             </div>
         </section>
     </div>
@@ -93,9 +98,7 @@
                     <label class="form-field">
                         <span>Category</span>
                         <select id="task-category" required>
-                            @foreach ($categories as $category)
-                                <option value="{{ $category->name }}">{{ $category->name }}</option>
-                            @endforeach
+                            <option value="">Select a category</option>
                         </select>
                     </label>
                     <label class="form-field">
@@ -111,6 +114,7 @@
                     <input id="task-due-date" type="date" required>
                     <small class="field-error" id="date-error"></small>
                 </label>
+                <p id="task-form-error" class="api-error" role="alert" hidden></p>
                 <div class="modal-actions">
                     <button type="button" class="secondary-button" id="cancel-task">Cancel</button>
                     <button type="submit" class="primary-button">Save task</button>

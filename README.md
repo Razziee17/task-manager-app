@@ -11,15 +11,17 @@
 
 A task manager application built with Laravel. Its frontend uses Blade templates, Tailwind CSS 4 for styling, Vite for building assets, and plain JavaScript in `resources/js/app.js`. It does not use React or Vue.
 
-Users can register, log in, and log out. Overview and task pages require an authenticated session. Task data is currently stored in browser local storage per user; database-backed task management is planned for the API stage.
+Users can register, log in, and log out. Overview and task pages require an authenticated session. The task list uses the authenticated session to call Laravel's JSON API with Fetch; tasks are saved in PostgreSQL and scoped to their owner.
 
 ### Local PostgreSQL database
 
 The application uses PostgreSQL 18 for its local database. Set the database values in `.env` to `pgsql`, host `127.0.0.1`, port `5432`, database `task_manager`, and username `postgres`. Set `DB_PASSWORD` to the password chosen during PostgreSQL installation. Keep `.env` local and do not commit it.
 
-Run `php artisan migrate` to create the database tables. Do not run `php artisan db:seed` if you want to keep the database free of starter categories.
+Run `php artisan migrate` to create the database tables, then run `php artisan db:seed --class=CategorySeeder` to add the Work, School, and Personal categories used by the task form. This does not add demo users or tasks.
 
-To browse the database, open pgAdmin 4 and connect to the PostgreSQL 18 server. Expand **Databases > task_manager > Schemas > public > Tables**. Refresh the Tables node to see the schema. User accounts created through registration are stored in the `users` table; task entries created in the current Tasks screen remain in browser local storage until the API integration is implemented.
+The authenticated JSON endpoints are `GET /api/categories` and `GET`, `POST`, `PATCH`, and `DELETE /api/tasks`. Task responses and validation errors use JSON. Tasks are only returned or modified for the signed-in user.
+
+To browse the database, open pgAdmin 4 and connect to the PostgreSQL 18 server. Expand **Databases > task_manager > Schemas > public > Tables**. Refresh the Tables node to see the schema. User accounts created through registration are stored in `users`; tasks created or changed on the Tasks page are stored in `tasks`.
 
 ### UI template sources
 

@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\TaskApiController;
 use App\Http\Controllers\TaskController;
 use Illuminate\Support\Facades\Route;
 
@@ -16,4 +17,9 @@ Route::middleware('auth')->group(function () {
     Route::get('/overview', [TaskController::class, 'overview'])->name('overview');
     Route::get('/tasks', [TaskController::class, 'tasks'])->name('tasks.index');
     Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
+
+    Route::prefix('api')->name('api.')->group(function () {
+        Route::get('/categories', [TaskApiController::class, 'categories'])->name('categories.index');
+        Route::apiResource('tasks', TaskApiController::class);
+    });
 });

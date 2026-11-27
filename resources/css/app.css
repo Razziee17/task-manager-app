@@ -235,6 +235,34 @@ body.app-body {
     @apply px-5 py-10 text-center text-sm text-slate-500;
 }
 
+.api-error {
+    @apply m-5 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700;
+}
+
+.api-error[hidden] {
+    @apply hidden;
+}
+
+.task-pagination {
+    @apply flex items-center justify-between gap-4 border-t border-slate-200 px-5 py-4 text-sm text-slate-600;
+}
+
+.task-pagination[hidden] {
+    @apply hidden;
+}
+
+.task-pagination-actions {
+    @apply flex gap-2;
+}
+
+.task-pagination-actions .secondary-button {
+    @apply px-3 py-2 text-xs;
+}
+
+.task-pagination-actions button:disabled {
+    @apply cursor-not-allowed opacity-50;
+}
+
 .screen-reader-only {
     @apply absolute size-px overflow-hidden whitespace-nowrap border-0 p-0;
 }

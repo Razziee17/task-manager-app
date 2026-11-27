@@ -4,12 +4,13 @@
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <meta name="color-scheme" content="light">
+        <meta name="csrf-token" content="{{ csrf_token() }}">
 
         <title>@yield('title', 'Overview') | {{ config('app.name', 'Task Manager') }}</title>
 
         @vite(['resources/css/app.css', 'resources/js/app.js'])
     </head>
-    <body class="app-body" data-user-id="{{ auth()->id() }}">
+    <body class="app-body" data-user-id="{{ auth()->id() }}" data-tasks-url="{{ route('tasks.index') }}">
         <div class="app-shell">
             <header class="app-header">
                 <div class="app-header-content">
